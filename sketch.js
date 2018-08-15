@@ -1,11 +1,16 @@
 
 let balls = [];
-let num = 8;
+let num = 4;
 var bumpSound;
+let emojis = [];
 
 
 function preload(){
 	bumpSound = loadSound("assets/Tab 2.m4a");
+	for (let i = 0; i < 73; i++) {
+		emojis[i] = loadImage('assets/emojis/emoji' + i + '.png');
+	}
+
 }
 
 
@@ -16,13 +21,14 @@ function setup() {
 
 	colorMode(HSB, 360, 100, 100);
 	for (let i = 0; i < num; i++){
-		let x = random(100, width - 100);
-		let y = random(100, height - 100);
-		let diam = random(50, 200);
+		let x = random(100, windowWidth - 100);
+		let y = random(100, windowHeight - 100);
+		let diam = random(60, 300);
 		let xspeed = random(-2, 2);
 		let yspeed = random(-2, 2);
 		let brightness = 100;
-		balls[i] = new Ball( x, y, diam, xspeed, yspeed, brightness, 1);
+		let emoji = random(emojis);
+		balls[i] = new Ball( x, y, diam, xspeed, yspeed, brightness, emoji);
 	}
 
 
@@ -53,22 +59,24 @@ function draw() {
 			balls.splice(i, 1);
 		}
 
+		//Boolean is false till..
 		let overlapping = false;
 
 		for (let j = 0; j < balls.length; j++){
-			if(balls[i] !== balls[j] && balls[i].intersects(balls[j])|| balls[i].contains(mouseX, mouseY)){
-				overlapping = true
+			//... one of these occurs
+			// If they are not the same object AND the objecti intersects objectj o objecti contains mouse
+			if(balls[i] !== balls[j] && balls[i].intersects(balls[j]) || balls[i].contains(mouseX, mouseY)){
+			//... while it lasts boolean (overlapping) will be true
+			overlapping = true
 			}
 		}
 
-
 		if (overlapping){
-			balls[i].changeColor(40);
+			balls[i].changeEmoji();
+
 		} else {
-			balls[i].changeColor(100);
+
 		}
-
-
 
 	}
 
@@ -92,22 +100,24 @@ function draw() {
 
 class Ball{
 
-	constructor(x, y, diam, xspeed, yspeed, brightness) {
+	constructor(x, y, diam, xspeed, yspeed, brightness, img) {
 		this.x = x;
 		this.y = y;
 		this.diam = diam;
 		this.xspeed = xspeed;
 		this.yspeed = yspeed;
 		this.brightness = brightness;
+		this.emoji = img
 	}
 
 	 display() {
-		var h = map(this.x, 0, width-this.diam, 160, 310);
- 		var s = map(this.y, 0, height, 10, 90);
-
-		fill(h, s, this.brightness, this.alpha);
-		noStroke(0);
-		ellipse(this.x, this.y, this.diam, this.diam);
+		// var h = map(this.x, 0, windowWidth-this.diam, 160, 310);
+ 		// var s = map(this.y, 0, windowHeight, 10, 90);
+		//
+		// fill(h, s, this.brightness, this.alpha);
+		// noStroke(0);
+		// ellipse(this.x, this.y, this.diam, this.diam);
+		image(this.emoji, this.x, this.y, this.diam, this.diam);
 	}
 
 	 move(){
@@ -115,27 +125,42 @@ class Ball{
 		this.y += this.yspeed;
 	}
 
-	changeColor(b) {
-		this.brightness = b;
+	changeEmoji() {
+		this.emoji = random(emojis);
+	}
+	//To take one object. and check if it is intersects with an (other)
+
+	bumb(){
+		this.xspeed *= -1;
+		bumpSound.play();
+		this.diam = this.diam - random(30);
+		this.yspeed *= -1;
+		bumpSound.play();
+		this.diam = this.diam - random(30);
+		//Idiotic alternative
 	}
 
 	intersects(other){
 		let d = dist(this.x, this.y, other.x, other.y);
 
-		// Return the truth of these statement
-		return (d < (this.diam/2) + (other.diam/2));
-		// if ( d < this.diam + other.diam){
+		// Return the truth of these statement instead of the larger alternative.
+
+		return (d < this.diam/2 + other.diam/2);
+
+		// if ( d < this.diam/2 + other.diam/2){
 		// 	return true;
 		// } else {
 		// 	return false;
 		// }
 	}
 
+	//To take one mouse (px, py) and check it are inside an this.object
 	contains(px,py){
-		// distance between center and mouse
 		let d = dist(px, py, this.x, this.y)
-
+		//circle
 		if (d < this.diam/2){
+		// rectangle
+		// if (px > this.x && px < this.x + this.diam && py < this.y && py < this.y + this.diam){
 			return true;
 		} else {
 			return false;
@@ -143,25 +168,24 @@ class Ball{
 	}
 
 	 checkBorders(){
-		if (this.x >= (width - this.diam/2)){
+		if (this.x >= (windowWidth - this.diam/2)){
 			this.xspeed *= -1;
 			bumpSound.play();
-			this.diam = this.diam - random(10, 30);
+			// this.diam = this.diam - random(10, 30);
 		} if ( this.x <= (0 + this.diam/2)){
 			this.xspeed *= -1;
 			bumpSound.play();
-			this.diam = this.diam - random(10, 30);
+			// this.diam = this.diam - random(10, 30);
 		}
 
-		if (this.y >= (height - this.diam/2)){
+		if (this.y >= (windowHeight - this.diam/2)){
 			this.yspeed *= -1;
 			bumpSound.play();
-			this.diam = this.diam - random(10, 30);
+			// this.diam = this.diam - random(10, 30);
 		} if (this.y <= (0 + this.diam/2)){
 			this.yspeed *= -1;
 			bumpSound.play();
-			this.diam = this.diam - random(10, 30);
+			// this.diam = this.diam - random(10, 30);
 		}
 	}
 }
-
