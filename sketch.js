@@ -1,6 +1,6 @@
 
 let balls = [];
-let num = 10;
+let num = 8;
 var bumpSound;
 
 
@@ -16,9 +16,9 @@ function setup() {
 
 	colorMode(HSB, 360, 100, 100);
 	for (let i = 0; i < num; i++){
-		let x = random(200, width - 200);
-		let y = random(200, height - 200);
-		let diam = random(50, 400);
+		let x = random(100, width - 100);
+		let y = random(100, height - 100);
+		let diam = random(50, 200);
 		let xspeed = random(-2, 2);
 		let yspeed = random(-2, 2);
 		let brightness = 100;
@@ -30,7 +30,7 @@ function setup() {
 
 function mousePressed() {
 	for (let i = 0; i < balls.length; i++){
-		if (balls[i].inside(mouseX, mouseY)){
+		if (balls[i].contains(mouseX, mouseY)){
 			balls.splice(i, 1);
 		}
 	}
@@ -49,30 +49,45 @@ function draw() {
 		balls[i].display();
 		balls[i].move();
 		balls[i].checkBorders();
-		// balls[i].popBall();
 		if (balls[i].diam <= 0){
 			balls.splice(i, 1);
 		}
 
-		if (balls[i].inside(mouseX, mouseY)) {
+		let overlapping = false;
+
+		for (let j = 0; j < balls.length; j++){
+			if(balls[i] !== balls[j] && balls[i].intersects(balls[j])|| balls[i].contains(mouseX, mouseY)){
+				overlapping = true
+			}
+		}
+
+
+		if (overlapping){
 			balls[i].changeColor(40);
 		} else {
 			balls[i].changeColor(100);
 		}
 
+
+
 	}
+
+	// If you need add/remove things or just take the half from the array you need to COUNT the array
+
+	// // not COUNT just give me everything in order to ...
+	// for (let ball of balls) {
+	// 	// ... do these things
+	// 	ball.display();
+	// 	ball.move();
+	// 	ball.checkBorders();
+	// for ( other of balls) {
+	// 	if ( ball !== other && ball.intersects(other)){
+	// 		overlapping = true;
+	// 	}
+	// }
+	// }
+
 }
-
-// If you need add/remove things or just take the half from the array you need to COUNT the array
-
-// // not COUNT just give me everything in order to ...
-// for (let ball of balls) {
-// 	// ... do these things
-// 	ball.display();
-// 	ball.move();
-// 	ball.checkBorders();
-// }
-// }
 
 
 class Ball{
@@ -104,15 +119,19 @@ class Ball{
 		this.brightness = b;
 	}
 
-	popBall() {
-		for (let i = 0; i < balls.length; i++){
-			if (this.diam < 0){
-				balls.splice(i, 1);
-			}
-		}
+	intersects(other){
+		let d = dist(this.x, this.y, other.x, other.y);
+
+		// Return the truth of these statement
+		return (d < (this.diam/2) + (other.diam/2));
+		// if ( d < this.diam + other.diam){
+		// 	return true;
+		// } else {
+		// 	return false;
+		// }
 	}
 
-	inside(px,py){
+	contains(px,py){
 		// distance between center and mouse
 		let d = dist(px, py, this.x, this.y)
 
@@ -127,21 +146,22 @@ class Ball{
 		if (this.x >= (width - this.diam/2)){
 			this.xspeed *= -1;
 			bumpSound.play();
-			this.diam = this.diam - random(50, 100);
+			this.diam = this.diam - random(10, 30);
 		} if ( this.x <= (0 + this.diam/2)){
 			this.xspeed *= -1;
 			bumpSound.play();
-			this.diam = this.diam - random(50, 100);
+			this.diam = this.diam - random(10, 30);
 		}
 
 		if (this.y >= (height - this.diam/2)){
 			this.yspeed *= -1;
 			bumpSound.play();
-			this.diam = this.diam - random(50, 100);
+			this.diam = this.diam - random(10, 30);
 		} if (this.y <= (0 + this.diam/2)){
 			this.yspeed *= -1;
 			bumpSound.play();
-			this.diam = this.diam - random(50, 100);
+			this.diam = this.diam - random(10, 30);
 		}
 	}
 }
+
