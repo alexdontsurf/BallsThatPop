@@ -1,0 +1,16 @@
+* {
+font-family: helvetica, sans-serif;
+}
+
+p {
+  font-size: 14px;
+}
+.header {
+    margin: 20px 20px;
+    float: left;
+}
+
+.footer {
+    margin: 20px 40px;
+    float: right;
+}
