@@ -22,7 +22,7 @@ function setup() {
 		let xspeed = random(-2, 2);
 		let yspeed = random(-2, 2);
 		let brightness = 100;
-		balls[i] = new Ball( x, y, diam, xspeed, yspeed, brightness, 1);
+		balls[i] = new Ball( x, y, diam, xspeed, yspeed, brightness);
 	}
 
 
@@ -34,7 +34,18 @@ function mousePressed() {
 			balls.splice(i, 1);
 		}
 	}
+
+
+	let diam = random(50, 200);
+	let xspeed = random(-2, 2);
+	let yspeed = random(-2, 2);
+	let brightness = 100;
+	var a = new Ball( mouseX, mouseY, diam, xspeed, yspeed, brightness);
+
+	balls.push(a);
 }
+
+
 
 
 function draw() {
@@ -54,22 +65,39 @@ function draw() {
 		}
 
 		let overlapping = false;
+		var newBalls = [];
 
-		for (let j = 0; j < balls.length; j++){
-			if(balls[i] !== balls[j] && balls[i].intersects(balls[j])|| balls[i].contains(mouseX, mouseY)){
-				overlapping = true
+			for (let j = 0; j < balls.length; j++){
+				if(balls[i] !== balls[j] && balls[i].intersects(balls[j])|| balls[i].contains(mouseX, mouseY)){
+					overlapping = true
+				}
+
+				if(balls[i] !== balls[j] && balls[i].intersects(balls[j])){
+					balls[i].bump();
+					balls[j].bump();
+				}
 			}
-		}
 
+			if (balls[i].isDead() == true){
+				balls.splice(i, 1);
+			}
 
-		if (overlapping){
-			balls[i].changeColor(40);
-		} else {
-			balls[i].changeColor(100);
-		}
+			if (overlapping){
+				balls[i].changeColor(60);
+			} else {
+				balls[i].changeColor(100);
+			}
 
-
-
+			if(balls.length <= (num)) {
+				let x = random(100, width - 100);
+				let y = random(100, height - 100);
+				let diam = random(50, 200);
+				let xspeed = random(-2, 2);
+				let yspeed = random(-2, 2);
+				let brightness = 100;
+				var a = new Ball( x, y, diam, xspeed, yspeed, brightness);
+				balls.push(a);
+			}
 	}
 
 	// If you need add/remove things or just take the half from the array you need to COUNT the array
@@ -105,7 +133,7 @@ class Ball{
 		var h = map(this.x, 0, width-this.diam, 160, 310);
  		var s = map(this.y, 0, height, 10, 90);
 
-		fill(h, s, this.brightness, this.alpha);
+		fill(h, s, this.brightness);
 		noStroke(0);
 		ellipse(this.x, this.y, this.diam, this.diam);
 	}
@@ -124,6 +152,7 @@ class Ball{
 
 		// Return the truth of these statement
 		return (d < (this.diam/2) + (other.diam/2));
+
 		// if ( d < this.diam + other.diam){
 		// 	return true;
 		// } else {
@@ -140,6 +169,21 @@ class Ball{
 		} else {
 			return false;
 		}
+	}
+
+	isDead() {
+    if (this.diam < 0.0) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+	bump(){
+		this.xspeed *= -1;
+		this.yspeed *= -1;
+		bumpSound.play();
+		this.diam = this.diam - random(10, 30);
 	}
 
 	 checkBorders(){
@@ -164,4 +208,3 @@ class Ball{
 		}
 	}
 }
-
